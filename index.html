@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Love Universe 💖</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;padding:20px 12px;
+ font-family:Arial,sans-serif;text-align:center;color:white;
+ background:radial-gradient(circle at top,#913d9f,#30154e 60%,#09051c);
+ overflow-x:hidden
+}
+.stars{position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background-image:radial-gradient(white 1px,transparent 1px),radial-gradient(#ffb9e8 1px,transparent 1px);
+ background-size:43px 43px,71px 71px;animation:twinkle 3s infinite alternate}
+@keyframes twinkle{to{opacity:.35}}
+header{padding:22px 5px}
+h1{font-size:clamp(36px,10vw,55px);line-height:1.1;
+ color:#ffd5f1;text-shadow:0 0 24px #ff70ce}
+.subtitle{color:#f1dafa}
+.card{max-width:440px;margin:20px auto;padding:24px 18px;
+ background:#ffffff12;border:1px solid #ffffff35;border-radius:25px;
+ box-shadow:0 10px 35px #09001855}
+.planet{font-size:65px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px) rotate(7deg)}}
+button{border:0;border-radius:30px;padding:13px 19px;margin:6px;
+ font-size:15px;font-weight:bold;cursor:pointer}
+.primary{background:linear-gradient(100deg,#ff83d1,#ffd6a5);color:#421442}
+.secondary{background:#ffffff20;color:white;border:1px solid #ffffff50}
+#message{min-height:65px;line-height:1.7;color:#ffe1f5}
+#meter{font-size:40px;color:#ffb6e5;font-weight:bold}
+footer{padding:20px;color:#d8c5ed;font-size:12px}
+.heart{position:fixed;bottom:-30px;pointer-events:none;animation:rise 5s linear forwards}
+@keyframes rise{to{transform:translateY(-110vh) rotate(360deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<header>
+<div style="font-size:30px">🌙 ✨ 💗 ✨ 🌙</div>
+<h1>The Love Universe</h1>
+<p class="subtitle">A little galaxy made of love, laughter & magic ✨</p>
+</header>
+<section class="card">
+<div class="planet">💖🪐</div>
+<h2>Welcome, Little Star! 🌟</h2>
+<p>You've entered the cutest corner of the universe!</p>
+<p>Warning: excessive smiling may occur. 😂💕</p>
+<button class="primary" onclick="surprise()">✨ Open Your Surprise</button>
+<p id="message">Psst... your surprise is waiting! 👀</p>
+</section>
+
+<section class="card">
+<h2>💗 The Love-o-Meter</h2>
+<div id="meter">0%</div>
+<p id="meterText">This universe needs your love!</p>
+<button class="primary" onclick="charge()">💞 Charge the Love</button>
+</section>
+
+<section class="card">
+<h2>🎵 Our Little Soundtrack</h2>
+<p>Tap play for a little melody made just for this universe.</p>
+<button class="primary" id="musicButton" onclick="toggleMusic()">▶ Play Music</button>
+<p id="musicStatus">Ready for a little magic? ✨</p>
+</section>
+
+<section class="card">
+<h2>🌠 Make a Wish</h2>
+<p>Close your eyes and think of something beautiful.</p>
+<button class="primary" onclick="makeWish()">🌟 Send My Wish</button>
+<p id="wish"></p>
+</section>
+
+<footer>
+Made with 💗, chaos & unlimited stardust ✨
+</footer>
+
+<script>
+let love=0;
+let audio=null;
+let playing=false;
+let timer=null;
+let note=0;
+
+function hearts(n=12){
+ for(let i=0;i<n;i++){
+  let h=document.createElement("div");
+  h.className="heart";
+  h.textContent=["💗","💖","💕","✨","💘"][Math.floor(Math.random()*5)];
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(20+Math.random()*20)+"px";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),5000);
+ }
+}
+
+function surprise(){
+ const msgs=[
+  "Plot twist: you're the main character! 👑💖",
+  "Official diagnosis: dangerously adorable! 😂💕",
+  "Sending you a million virtual hugs! 🫂",
+  "The stars called. They said you're shining! 🌟",
+  "You deserve love that feels like home. 🏡💗",
+  "Breaking news: somebody is ICONIC! It's YOU! 😂"
+ ];
+ document.getElementById("message").textContent=
+ msgs[Math.floor(Math.random()*msgs.length)];
+ hearts(20);
+}
+
+function charge(){
+ love=Math.min(100,love+20);
+ document.getElementById("meter").textContent=love+"%";
+ document.getElementById("meterText").textContent=
+ love===100?"UNIVERSE FULL OF LOVE! 🚀💖":
+ "Charging up the stardust... ✨";
+ hearts(10);
+}
+
+function toggleMusic(){
+ if(playing){
+  clearInterval(timer);
+  if(audio)audio.close();
+  audio=null;
+  playing=false;
+  document.getElementById("musicButton").textContent="▶ Play Music";
+  document.getElementById("musicStatus").textContent="Music paused 🎵";
+  return;
+ }
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)throw Error();
+  audio=new AC();
+  audio.resume();
+  playing=true;
+  document.getElementById("musicButton").textContent="⏸ Stop Music";
+  document.getElementById("musicStatus").textContent="Your melody is playing! 🎶💗";
+  const melody=[523,659,784,659,587,698,659,523];
+  function playNote(){
+   if(!audio||audio.state==="closed")return;
+   const osc=audio.createOscillator();
+   const gain=audio.createGain();
+   osc.type="sine";
+   osc.frequency.value=melody[note%melody.length];
+   gain.gain.setValueAtTime(0.001,audio.currentTime);
+   gain.gain.exponentialRampToValueAtTime(0.12,audio.currentTime+0.04);
+   gain.gain.exponentialRampToValueAtTime(0.001,audio.currentTime+0.35);
+   osc.connect(gain);
+   gain.connect(audio.destination);
+   osc.start();
+   osc.stop(audio.currentTime+0.4);
+   note++;
+  }
+  playNote();
+  timer=setInterval(playNote,450);
+ }catch(e){
+  document.getElementById("musicStatus").textContent=
+  "Audio unavailable. Try another browser.";
+ }
+}
+
+function makeWish(){
+ const wishes=[
+  "May something beautiful find you today. 🌷",
+  "May your heart find peace and happiness. 💗",
+  "May your next chapter surprise you beautifully. 🌈",
+  "May you always feel loved and appreciated. 🫶",
+  "The universe is listening. Keep believing! 🌟"
+ ];
+ document.getElementById("wish").textContent=
+ wishes[Math.floor(Math.random()*wishes.length)];
+ hearts(18);
+}
+</script>
+</body>
+</html>
